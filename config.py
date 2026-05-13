@@ -4,17 +4,19 @@ from datetime import timedelta
 class Config:
     SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "fallback-dev-secret")
 
-    # psycopg3 uses postgresql+psycopg:// dialect
+    # Build DB URL — support psycopg3 dialect
     _db_url = os.environ["DATABASE_URL"]
+    # Normalize any postgres:// prefix first
     _db_url = _db_url.replace("postgres://", "postgresql://")
-    _db_url = _db_url.replace("postgresql://", "postgresql+psycopg://")
+    # Switch to psycopg3 driver
+    if "postgresql+psycopg://" not in _db_url:
+        _db_url = _db_url.replace("postgresql://", "postgresql+psycopg://")
     SQLALCHEMY_DATABASE_URI = _db_url
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {
         "pool_pre_ping": True,
         "pool_recycle":  300,
-        "connect_args":  {"sslmode": "require"},
     }
 
     JWT_SECRET_KEY            = os.environ.get("JWT_SECRET_KEY", "fallback-dev-secret")
@@ -33,6 +35,5 @@ class Config:
         "https://abdoukadir-ai.github.io,http://localhost:3000"
     ).split(",")
 
-    PLAYWRIGHT_HEADLESS = True
     DEFAULT_MIN_SCORE   = 70
     DEFAULT_DAILY_LIMIT = 50
