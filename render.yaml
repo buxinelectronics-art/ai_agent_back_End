@@ -3,7 +3,7 @@ services:
     name: jobagent-api
     runtime: python
     plan: free
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt && playwright install chromium && playwright install-deps chromium
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: gunicorn app:app -c gunicorn.conf.py
     envVars:
       - key: GEMINI_API_KEY
@@ -20,8 +20,6 @@ services:
         value: /var/data/generated
       - key: ALLOWED_ORIGINS
         value: https://abdoukadir-ai.github.io,http://localhost:3000
-      - key: PLAYWRIGHT_HEADLESS
-        value: "true"
       - key: FLASK_DEBUG
         value: "false"
     disk:
