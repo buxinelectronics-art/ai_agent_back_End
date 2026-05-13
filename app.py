@@ -19,12 +19,12 @@ def create_app():
     jwt.init_app(app)
     bcrypt.init_app(app)
 
-    app.register_blueprint(auth_bp,         url_prefix="/api/auth")
-    app.register_blueprint(profile_bp,      url_prefix="/api/profile")
-    app.register_blueprint(jobs_bp,         url_prefix="/api/jobs")
-    app.register_blueprint(resume_bp,       url_prefix="/api/resume")
-    app.register_blueprint(automation_bp,   url_prefix="/api/automation")
-    app.register_blueprint(applications_bp, url_prefix="/api/applications")
+    app.register_blueprint(auth_bp,          url_prefix="/api/auth")
+    app.register_blueprint(profile_bp,       url_prefix="/api/profile")
+    app.register_blueprint(jobs_bp,          url_prefix="/api/jobs")
+    app.register_blueprint(resume_bp,        url_prefix="/api/resume")
+    app.register_blueprint(automation_bp,    url_prefix="/api/automation")
+    app.register_blueprint(applications_bp,  url_prefix="/api/applications")
 
     @app.route("/api/health")
     def health():
@@ -36,6 +36,7 @@ def create_app():
         os.makedirs(app.config["GENERATED_FOLDER"], exist_ok=True)
 
     return app
+
 
 app = create_app()
 
