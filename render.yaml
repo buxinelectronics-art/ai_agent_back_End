@@ -1,0 +1,78 @@
+services:
+
+  - type: web
+    name: jobagent-api
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      playwright install chromium
+      playwright install-deps chromium
+    startCommand: gunicorn app:app -c gunicorn.conf.py
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: jobagent-redis
+          type: redis
+          property: connectionString
+      - key: DATABASE_URL
+        sync: false
+      - key: UPLOAD_FOLDER
+        value: /var/data/uploads
+      - key: GENERATED_FOLDER
+        value: /var/data/generated
+      - key: ALLOWED_ORIGINS
+        value: https://abdoukadir-ai.github.io,http://localhost:3000
+      - key: PLAYWRIGHT_HEADLESS
+        value: "true"
+      - key: FLASK_DEBUG
+        value: "false"
+    disk:
+      name: jobagent-data
+      mountPath: /var/data
+      sizeGB: 10
+
+  - type: worker
+    name: jobagent-worker
+    runtime: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      playwright install chromium
+      playwright install-deps chromium
+    startCommand: celery -A tasks.celery worker --loglevel=info --concurrency=2
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-1.5-flash
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          name: jobagent-redis
+          type: redis
+          property: connectionString
+      - key: DATABASE_URL
+        sync: false
+      - key: UPLOAD_FOLDER
+        value: /var/data/uploads
+      - key: GENERATED_FOLDER
+        value: /var/data/generated
+      - key: PLAYWRIGHT_HEADLESS
+        value: "true"
+    disk:
+      name: jobagent-data
+      mountPath: /var/data
+      sizeGB: 10
+
+  - type: redis
+    name: jobagent-redis
+    plan: free
+    maxmemoryPolicy: allkeys-lru
